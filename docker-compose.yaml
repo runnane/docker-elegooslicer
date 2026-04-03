@@ -1,0 +1,23 @@
+---
+services:
+  elegooslicer:
+    build: .
+    container_name: elegooslicer
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DISPLAY=:99            # Avoid conflict with host X server when using host networking
+      # - CUSTOM_USER=abc      # Optional: custom username
+      # - PASSWORD=changeme    # Optional: password for basic auth
+      # - PIXELFLUX_WAYLAND=true  # Optional: enable Wayland mode for GPU acceleration
+    volumes:
+      - ./config:/config
+      - ../gcode:/gcode:ro     # Optional: mount gcode output directory
+      - /mnt/filestore/3dprint:/3dprint
+    network_mode: host         # Required for mDNS device discovery
+    shm_size: "1gb"
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+    # For Nvidia GPU, see README for runtime configuration
