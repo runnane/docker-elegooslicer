@@ -1,8 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-# Ensure avahi run directory exists
-mkdir -p /run/avahi-daemon
-chown avahi:avahi /run/avahi-daemon
-
-# Run avahi-daemon in foreground
-exec avahi-daemon --no-drop-root --no-chroot --no-rlimits

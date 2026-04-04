@@ -26,9 +26,9 @@ The Dockerfile applies a binary patch at build time to the `elegoo-slicer` ELF b
 
 The patch includes assertions that verify the original bytes before writing, so the build will fail if the binary changes in a future release (requiring the offsets to be updated).
 
-### mDNS / Avahi Support
+### Printer Discovery
 
-The container runs an Avahi daemon (via s6-overlay) to enable mDNS-based printer discovery on the local network. This requires `network_mode: host` in docker-compose to function correctly.
+Elegoo printers are discovered via UDP broadcast on the local network (not mDNS). This requires `network_mode: host` in docker-compose so the container can send and receive broadcast packets on the LAN. The slicer connects to discovered printers via MQTT.
 
 ## Supported Architectures
 

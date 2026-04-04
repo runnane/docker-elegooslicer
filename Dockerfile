@@ -44,12 +44,7 @@ RUN \
     libmspack0 \
     libwebkit2gtk-4.1-0 \
     libwx-perl \
-    libfuse2 \
-    avahi-daemon \
-    avahi-utils \
-    libnss-mdns && \
-  echo "**** configure avahi/mdns ****" && \
-  sed -i 's/^hosts:.*/hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4/' /etc/nsswitch.conf && \
+    libfuse2 && \
   echo "**** install elegooslicer from appimage ****" && \
   if [ -z ${ELEGOOSLICER_VERSION+x} ]; then \
     ELEGOOSLICER_VERSION=$(curl -sX GET \
@@ -83,7 +78,6 @@ RUN \
 
 # add local files
 COPY /root /
-RUN chmod +x /etc/s6-overlay/s6-rc.d/svc-avahi/run
 
 # ports and volumes
 EXPOSE 3000 3001

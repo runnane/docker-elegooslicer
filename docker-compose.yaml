@@ -6,8 +6,10 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Oslo
       - DISPLAY=:99            # Avoid conflict with host X server when using host networking
+      - CUSTOM_PORT=3100       # Default: 3000
+      - CUSTOM_HTTPS_PORT=3101 # Default: 3001
       # - CUSTOM_USER=abc      # Optional: custom username
       # - PASSWORD=changeme    # Optional: password for basic auth
       # - PIXELFLUX_WAYLAND=true  # Optional: enable Wayland mode for GPU acceleration
@@ -15,7 +17,7 @@ services:
       - ./config:/config
       - ../gcode:/gcode:ro     # Optional: mount gcode output directory
       - /mnt/filestore/3dprint:/3dprint
-    network_mode: host         # Required for mDNS device discovery
+    network_mode: host         # Required for UDP broadcast printer discovery
     shm_size: "1gb"
     restart: unless-stopped
     devices:
