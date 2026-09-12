@@ -23,14 +23,25 @@ services:
     devices:
       - /dev/dri:/dev/dri
     # For Nvidia GPU, see README for runtime configuration
-    # Healthcheck probes the Selkies HTTP port to surface "UI frozen" stalls in `docker ps`.
-    # Note: Docker's restart policy does NOT auto-restart unhealthy containers — pair this
-    # with willfarrell/autoheal (label: autoheal=true) or an external watcher to recover.
+    # Healthcheck: surfaces both classes of "UI frozen" stalls we have seen:
+    #   1. Selkies HTTP port unresponsive (web stack down)
+    #   2. Xvfb window tree contains a dangling drawable from a leaked WebKit
+    #      subprocess — slicer GUI thread wedges on BadDrawable until the
+    #      container is restarted (Xvfb-side state corruption, see README).
+    # Pair with willfarrell/autoheal (label below) to actually recover.
     labels:
       - autoheal=true
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 5 http://localhost:${CUSTOM_PORT:-3100}/ >/dev/null || exit 1"]
+      test:
+        - "CMD-SHELL"
+        - |
+          set -e
+          curl -fsS --max-time 5 http://localhost:${CUSTOM_PORT:-3100}/ >/dev/null
+          # Probe X11: enumerate root children and try to read each. If any throws
+          # BadDrawable / BadWindow, the X session is poisoned and we are frozen.
+          DISPLAY=:99 xwininfo -root -tree 2>&1 | grep -qE "Bad ?(Drawable|Window)" && exit 1
+          exit 0
       interval: 60s
-      timeout: 10s
+      timeout: 15s
       retries: 3
       start_period: 120s
